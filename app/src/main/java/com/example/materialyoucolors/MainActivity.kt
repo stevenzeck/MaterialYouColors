@@ -141,6 +141,6 @@ val String.color
 @Composable
 fun DefaultPreview() {
     MaterialYouColorsTheme {
-        ColorRow("300", "#385870")
+        ColorRow("300", "#3858700")
     }
 }
