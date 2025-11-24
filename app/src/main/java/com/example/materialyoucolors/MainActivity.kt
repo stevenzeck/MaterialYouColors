@@ -6,25 +6,33 @@ import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
 import androidx.annotation.RequiresApi
 import androidx.compose.foundation.background
-import androidx.compose.foundation.layout.*
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material3.*
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
+import androidx.compose.material3.TopAppBar
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
-import androidx.compose.ui.graphics.toArgb
+import androidx.compose.ui.graphics.luminance
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.graphics.toColorInt
 import com.example.materialyoucolors.ui.theme.ColorHelper
 import com.example.materialyoucolors.ui.theme.MaterialYouColorsTheme
 import com.example.materialyoucolors.ui.theme.colorMap
-import com.google.android.material.color.MaterialColors
 
 
 @ExperimentalMaterial3Api
@@ -55,14 +63,18 @@ class MainActivity : ComponentActivity() {
             MaterialYouColorsTheme {
                 Scaffold(
                     topBar = {
-                        SmallTopAppBar(
+                        TopAppBar(
                             title = {
                                 Text(text = stringResource(id = R.string.app_name))
                             },
                         )
                     },
-                ) {
-                    Column(modifier = Modifier.verticalScroll(scrollState)) {
+                ) { innerPadding ->
+                    Column(
+                        modifier = Modifier
+                            .padding(innerPadding)
+                            .verticalScroll(scrollState)
+                    ) {
                         colorTypes.forEach { colorType ->
                             val title = colorType.uppercase().replace('_', ' ')
                             SectionTitle(text = title)
@@ -72,7 +84,7 @@ class MainActivity : ComponentActivity() {
                                     this@MainActivity,
                                     colorMap[colorString]!!
                                 )
-                                ColorRow(name = colorShade, color = color)
+                                ColorRow(name = colorShade, colorString = color)
                             }
                         }
                     }
@@ -100,12 +112,16 @@ fun SectionTitle(text: String) {
 }
 
 @Composable
-fun ColorRow(name: String, color: String) {
+fun ColorRow(name: String, colorString: String) {
+
+    val actualColor = colorString.color
+    val textColor = if (actualColor.luminance() > 0.5f) Color.Black else Color.White
+
     Row {
         Box(
             modifier = Modifier
                 .fillMaxWidth()
-                .background(color.color)
+                .background(actualColor)
                 .padding(20.dp)
         ) {
             SelectionContainer {
@@ -113,20 +129,19 @@ fun ColorRow(name: String, color: String) {
                     text = name,
                     fontSize = 22.sp,
                     fontWeight = FontWeight.Bold,
-                    color = if (MaterialColors.isColorLight(color.color.toArgb())) Color.Black else Color.White,
+                    color = textColor,
                     modifier = Modifier.align(Alignment.CenterStart),
                 )
             }
             Box(
-                modifier = Modifier
-                    .align(Alignment.CenterEnd),
+                modifier = Modifier.align(Alignment.CenterEnd),
             ) {
                 SelectionContainer {
                     Text(
-                        text = color,
+                        text = colorString,
                         fontSize = 22.sp,
                         fontWeight = FontWeight.Bold,
-                        color = if (MaterialColors.isColorLight(color.color.toArgb())) Color.Black else Color.White,
+                        color = textColor,
                     )
                 }
             }
@@ -135,7 +150,7 @@ fun ColorRow(name: String, color: String) {
 }
 
 val String.color
-    get() = Color(android.graphics.Color.parseColor(this))
+    get() = Color(this.toColorInt())
 
 @Preview(showBackground = true)
 @Composable
