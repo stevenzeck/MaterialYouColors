@@ -1,16 +1,17 @@
 package com.example.materialyoucolors
 
-import android.os.Build
+import android.content.Context
 import android.os.Bundle
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
-import androidx.annotation.RequiresApi
+import androidx.annotation.ColorRes
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
-import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.lazy.LazyColumn
+import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.selection.SelectionContainer
 import androidx.compose.foundation.verticalScroll
@@ -29,8 +30,8 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.toColorInt
-import com.example.materialyoucolors.ui.theme.ColorHelper
 import com.example.materialyoucolors.ui.theme.MaterialYouColorsTheme
 import com.example.materialyoucolors.ui.theme.colorMap
 
@@ -55,7 +56,6 @@ class MainActivity : ComponentActivity() {
         "1000"
     )
 
-    @RequiresApi(Build.VERSION_CODES.S)
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         setContent {
@@ -70,20 +70,18 @@ class MainActivity : ComponentActivity() {
                         )
                     },
                 ) { innerPadding ->
-                    Column(
+                    LazyColumn(
                         modifier = Modifier
                             .padding(innerPadding)
                             .verticalScroll(scrollState)
                     ) {
-                        colorTypes.forEach { colorType ->
+                        items(colorTypes) { colorType ->
                             val title = colorType.uppercase().replace('_', ' ')
                             SectionTitle(text = title)
                             colorShades.forEach { colorShade ->
                                 val colorString = "${colorType}_$colorShade"
-                                val color = ColorHelper.getColorHex(
-                                    this@MainActivity,
-                                    colorMap[colorString]!!
-                                )
+                                val color =
+                                    this@MainActivity.getHexColor(colorMap[colorString] ?: 0)
                                 ColorRow(name = colorShade, colorString = color)
                             }
                         }
@@ -151,6 +149,11 @@ fun ColorRow(name: String, colorString: String) {
 
 val String.color
     get() = Color(this.toColorInt())
+
+fun Context.getHexColor(@ColorRes id: Int): String {
+    val colorInt = ContextCompat.getColor(this, id)
+    return String.format("#%06X", (colorInt and 0xFFFFFF))
+}
 
 @Preview(showBackground = true)
 @Composable

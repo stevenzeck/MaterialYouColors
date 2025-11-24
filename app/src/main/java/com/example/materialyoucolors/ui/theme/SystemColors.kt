@@ -1,16 +1,7 @@
 package com.example.materialyoucolors.ui.theme
 
-import android.content.Context
-import android.os.Build
-import androidx.annotation.ColorRes
-import androidx.annotation.RequiresApi
-import androidx.core.content.ContextCompat
 
-
-@RequiresApi(Build.VERSION_CODES.S)
-val colorMap = mutableMapOf(
-    "accent_1_0" to android.R.color.system_accent1_0,
-
+val colorMap = mapOf(
     "accent_1_0" to android.R.color.system_accent1_0,
     "accent_1_10" to android.R.color.system_accent1_10,
     "accent_1_50" to android.R.color.system_accent1_50,
@@ -81,12 +72,3 @@ val colorMap = mutableMapOf(
     "neutral_2_900" to android.R.color.system_neutral2_900,
     "neutral_2_1000" to android.R.color.system_neutral2_1000,
 )
-
-object ColorHelper {
-    fun getColorHex(context: Context, @ColorRes id: Int): String {
-        return String.format(
-            "#%06x",
-            ContextCompat.getColor(context, id) and 0xffffff
-        ).uppercase()
-    }
-}
